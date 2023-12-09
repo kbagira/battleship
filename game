@@ -1,0 +1,140 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+const int rows = 8;
+const int cols = 8;
+int arr[rows][cols];  
+
+bool isShipAdjacent(int arr[][cols], int row, int col) {
+    return (
+        (row > 1 && arr[row - 1][col] == 1) ||
+        (row < rows - 1 && arr[row + 1][col] == 1) ||
+        (col > 1 && arr[row][col - 1] == 1) ||
+        (col < cols - 1 && arr[row][col + 1] == 1) ||
+        (row > 1 && col > 1 && arr[row - 1][col - 1] == 1) ||
+        (row > 1 && col < cols - 1 && arr[row - 1][col + 1] == 1) ||
+        (row < rows - 1 && col > 1 && arr[row + 1][col - 1] == 1) ||
+        (row < rows - 1 && col < cols - 1 && arr[row + 1][col + 1] == 1)
+    );
+}
+
+void printBoard(int arr[][cols]) {
+    cout << "  ";
+    for (int j = 1; j < cols; j++) {
+        cout << j << " ";
+    }
+    cout << endl;
+    for (int i = 1; i < rows; i++) {
+        cout << i << " ";
+        for (int j = 1; j < cols; j++) {
+            cout << arr[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+int countShips(int arr[][cols]) {
+    int count = 0;
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {
+            if (arr[i][j] == 1) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+int main() {
+    int displayBoard[rows][cols];
+    int gameBoard[rows][cols];
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            displayBoard[i][j] = 0;
+            gameBoard[i][j] = 0;
+        }
+    }
+    srand(time(0));
+    cout << " ";
+    for (int j = 1; j < cols; j++) {
+        cout << j << " ";
+    }
+    cout << endl;
+
+    for (int i = 1; i < rows; i++) {
+        cout << i << " ";
+        for (int j = 1; j < cols; j++) {
+            cout << displayBoard[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    int row, col;
+    row = rand() % (rows - 2) + 1;
+    col = rand() % (cols - 2) + 1;
+    while (isShipAdjacent(gameBoard, row, col) || gameBoard[row][col] == 1 || gameBoard[row][col + 1] == 1 || gameBoard[row][col + 2] == 1) {
+        row = rand() % (rows - 2) + 1;
+        col = rand() % (cols - 2) + 1;
+    }
+    gameBoard[row][col] = 1;
+    gameBoard[row][col + 1] = 1;
+    gameBoard[row][col + 2] = 1;
+
+    for (int ship = 0; ship < 2; ship++) {
+        row = rand() % rows + 1;
+        col = rand() % (cols - 1);
+    while (isShipAdjacent(gameBoard, row, col) || gameBoard[row][col] == 1 || gameBoard[row][col + 1] == 1) {
+    row = rand() % rows + 1;
+    col = rand() % (cols - 1) + 1;
+    }
+    gameBoard[row][col] = 1;
+    gameBoard[row][col + 1] = 1;
+    }
+
+    for (int ship = 0; ship < 4; ship++) {
+        row = rand() % rows + 1;
+        col = rand() % cols + 1;
+    while (isShipAdjacent(gameBoard, row, col) || gameBoard[row][col] == 1) {
+        row = rand() % rows + 1;
+        col = rand() % cols + 1;
+    }
+    gameBoard[row][col] = 1;
+    }
+
+   while (countShips(gameBoard) > 0) {
+        cout << "Enter coordinates (row, col): ";
+        int n, m;
+        cin >> n >> m;
+
+        if (gameBoard[n][m] == 1) {
+             cout << "Hit!" << endl;
+            displayBoard[n][m] = 1;
+            printBoard(displayBoard);
+            gameBoard[n][m] = 0; 
+        } else {
+            cout << "Miss!" << endl;
+            displayBoard[n][m] = 8; 
+            printBoard(displayBoard);
+   }
+
+   cout << "Press Enter to continue...";
+   cin.ignore();
+   cin.get(); 
+   clearScreen(); 
+   printBoard(displayBoard);
+   }
+
+   cout << "Congratulations! All ships have been sunk." << endl;
+
+    return 0;
+}
